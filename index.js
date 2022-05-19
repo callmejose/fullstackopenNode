@@ -1,7 +1,7 @@
 const express = require("express")
 const app = express()
 
-const phonebook = [
+let phonebook = [
     { 
       "id": 1,
       "name": "Arto Hellas", 
@@ -45,6 +45,15 @@ app.get('/info', (request, response) => {
         `<h1>Phonebook has info for ${phonebook.length} people</h1>
         <p>${new Date().toString()}</p>`
     )
+})
+
+app.delete('/api/persons/:id', (request, response) => {
+  const id = Number(request.params.id)
+  console.log('delete', id)
+  phonebook = [...phonebook.filter(e => e.id !== id)]
+  response.status(204).json({
+    status: 'content deleted'
+  })
 })
 
 const PORT = 3001
