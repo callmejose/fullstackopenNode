@@ -24,7 +24,7 @@ const phonebook = [
     }
 ]
 
-app.get('/', (request, response) => {
+app.get('/api/persons', (request, response) => {
     response.json(phonebook)
 })
 
