@@ -1,6 +1,8 @@
 const express = require("express")
 const app = express()
 
+app.use(express.json())
+
 let phonebook = [
     { 
       "id": 1,
@@ -23,6 +25,10 @@ let phonebook = [
       "number": "39-23-6423122"
     }
 ]
+
+const generateId = () => 
+  Math.max(...phonebook.map(e => e.id)) + 1
+console.log('max id: ', generateId())
 
 app.get('/api/persons', (request, response) => {
     response.json(phonebook)
@@ -54,6 +60,20 @@ app.delete('/api/persons/:id', (request, response) => {
   response.status(204).json({
     status: 'content deleted'
   })
+})
+
+app.post('/api/persons', (request, response) => {
+  const body = request.body
+  console.log(body)
+
+  const newEntry = {
+    id: generateId(),
+    name: body.name,
+    number: body.number
+  }
+
+  phonebook = phonebook.concat(newEntry)
+  response.status(201).json(newEntry)
 })
 
 const PORT = 3001
