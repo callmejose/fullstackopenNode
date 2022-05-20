@@ -3,9 +3,6 @@ const morgan = require("morgan")
 
 const app = express()
 
-app.use(express.json())
-app.use(morgan('tiny'))
-
 let phonebook = [
   {
     "id": 1,
@@ -29,11 +26,24 @@ let phonebook = [
   }
 ]
 
+app.use(express.json())
+
+morgan.token('newEntry', (req) => {
+  if (req.body.name && req.body.number) {
+    return `{"name":"${req.body.name}","number":"${req.body.number}"}`
+  }
+  return ''
+})
+app.use(morgan(
+  ':method :url :status :res[content-length] - :response-time ms :newEntry'
+  ))
+
 const generateId = () =>
   Math.max(...phonebook.map(e => e.id)) + 1
 // console.log('max id: ', generateId())
 
 app.get('/api/persons', (request, response) => {
+  // console.log(JSON.stringify(phonebook))
   response.json(phonebook)
 })
 
@@ -46,7 +56,7 @@ app.get('/api/persons/:id', (request, response) => {
     })
     return
   }
-  console.log('phone: ', String(entrybook.name))
+  // console.log('phone: ', String(entrybook.name))
   response.json(entrybook)
 })
 
