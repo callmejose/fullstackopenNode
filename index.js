@@ -1,9 +1,8 @@
 require('dotenv').config()
-const express = require("express")
-const morgan = require("morgan")
-const cors = require("cors")
-const Phone = require("./models/phone")
-const phone = require('./models/phone')
+const express = require('express')
+const morgan = require('morgan')
+const cors = require('cors')
+const Phone = require('./models/phone')
 
 const app = express()
 
@@ -59,7 +58,6 @@ app.delete('/api/persons/:id', (request, response, next) => {
       })
     })
     .catch(error => next(error))
-
 })
 
 app.post('/api/persons', (request, response, next) => {
@@ -80,7 +78,7 @@ app.post('/api/persons', (request, response, next) => {
   phone.save().then(savedPhone => {
     response.status(201).json(savedPhone)
   })
-  .catch(error => next(error))
+    .catch(error => next(error))
 })
 
 app.put('/api/persons/:id', (request, response, next) => {
@@ -100,10 +98,10 @@ app.put('/api/persons/:id', (request, response, next) => {
   }
 
   Phone.findByIdAndUpdate(
-    request.params.id, 
+    request.params.id,
     phone,
     { new: true, runValidators: true, context: 'query' }
-    )
+  )
     .then(updatedPhone => {
       response.status(201).json(updatedPhone)
     })
@@ -119,11 +117,13 @@ app.use(unknownEndpoint)
 const errorHandler = (error, request, response, next) => {
   console.error(error.message)
 
-  if (error.name === 'CastError')
+  if (error.name === 'CastError') {
     return response.status(400).send({ error: 'malformatted id' })
+  }
 
-  if (error.name === 'ValidationError')
+  if (error.name === 'ValidationError') {
     return response.status(400).send({ error: error.message })
+  }
 
   next(error)
 }
