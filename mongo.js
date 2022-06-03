@@ -2,8 +2,11 @@ require('dotenv').config()
 const mongoose = require("mongoose")
 // const MONGO = require('./secrets/mongoAtlas.json')
 
-// "mongodb+srv://api-test:${ password }@cluster0.qzlffvu.mongodb.net/${ database }?retryWrites=true&w=majority"
+// "mongodb+srv://${{ MONGOUSER }}:${ PASSWORD }@cluster0.qzlffvu.mongodb.net/${ DATABASE }?retryWrites=true&w=majority"
 const url = process.env.MONGODB_URI.replace(
+    '${{ MONGOUSER }}',
+    process.env.MONGOUSER
+).replace(
     '${{ PASSWORD }}',
     process.env.PASSWORD
 ).replace(
@@ -13,8 +16,15 @@ const url = process.env.MONGODB_URI.replace(
 mongoose.connect(url)
 
 const phoneSchema = new mongoose.Schema({
-    name: String,
-    number: String
+    name: {
+        type: String,
+        minlength: 3,
+        required: true
+    },
+    number: {
+        type: String,
+        required: true
+    }
 })
 
 const Phone = mongoose.model('Phone', phoneSchema)

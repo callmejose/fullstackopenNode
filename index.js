@@ -36,7 +36,7 @@ app.get('/api/persons/:id', (request, response, next) => {
       response.status(404).end()
     }
   })
-  .catch(error => next(error))
+    .catch(error => next(error))
 })
 
 app.get('/info', (request, response) => {
@@ -62,16 +62,9 @@ app.delete('/api/persons/:id', (request, response, next) => {
 
 })
 
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
   const body = request.body
   // console.log(body)
-
-  if (!body.name || !body.number) {
-    response.status(400).json({
-      error: 'missing name and/or number'
-    })
-    return
-  }
 
   // if (phonebook.find(e => e.name === body.name)) {
   //   response.status(400).json({
@@ -87,13 +80,14 @@ app.post('/api/persons', (request, response) => {
   phone.save().then(savedPhone => {
     response.status(201).json(savedPhone)
   })
+  .catch(error => next(error))
 })
 
 app.put('/api/persons/:id', (request, response, next) => {
   const body = request.body
   // console.log('updating...', body)
 
-  if (!body.name || !body.number){
+  if (!body.name || !body.number) {
     response.status(400).json({
       error: 'missing name and/or number'
     })
@@ -105,7 +99,11 @@ app.put('/api/persons/:id', (request, response, next) => {
     number: body.number
   }
 
-  Phone.findByIdAndUpdate(request.params.id, phone)
+  Phone.findByIdAndUpdate(
+    request.params.id, 
+    phone,
+    { new: true, runValidators: true, context: 'query' }
+    )
     .then(updatedPhone => {
       response.status(201).json(updatedPhone)
     })
@@ -119,13 +117,15 @@ const unknownEndpoint = (request, response) => {
 app.use(unknownEndpoint)
 
 const errorHandler = (error, request, response, next) => {
- console.error(error.message)
+  console.error(error.message)
 
- if (error.name === 'CastError') {
-   return response.status(400).send({ error: 'malformatted id' })
- }
+  if (error.name === 'CastError')
+    return response.status(400).send({ error: 'malformatted id' })
 
- next(error)
+  if (error.name === 'ValidationError')
+    return response.status(400).send({ error: error.message })
+
+  next(error)
 }
 
 app.use(errorHandler)
